@@ -1,0 +1,7 @@
+Test Java application for store and management of records.
+
+Created using SpringBoot framework.
+
+Clone application as Maven project.
+
+Run InterviewtaskApplication.java to start server.
