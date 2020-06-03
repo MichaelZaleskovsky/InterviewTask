@@ -105,7 +105,7 @@ class InterviewtaskApplicationTests {
 	}
 
 	@Test
-	void WrongFileUpload() {
+	void WrongFileUpload() {													//Do not add wrong record
 	
 		given().contentType("multipart/form-data")
 		.multiPart("file", new File("test-wrong.txt"), "text/html")
