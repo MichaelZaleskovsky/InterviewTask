@@ -37,6 +37,7 @@ public class RecordServiceImpl implements RecordService {
 	public HttpStatus addRecords(MultipartFile file) {
 		
 		InputStream input = null;
+		HttpStatus result;
 		try {
 			input = file.getInputStream();
 		} catch (IOException e) {
@@ -45,38 +46,39 @@ public class RecordServiceImpl implements RecordService {
 		}
 		Scanner scanner = new Scanner(input);
 		
-		if (file.isEmpty() || !scanner.nextLine().equals(HEADER)) return HttpStatus.NOT_ACCEPTABLE;
-		
-		String line;
-		String[] tokens;
-		List<Record> records = new ArrayList<>();
-		
-		while (scanner.hasNext()) {
-			line = scanner.nextLine();
+		if (file.isEmpty() || !scanner.nextLine().equals(HEADER)) {
+			result = HttpStatus.NOT_ACCEPTABLE;
+		} else {
+			String line;
+			String[] tokens;
+			List<Record> records = new ArrayList<>();
 			
-			if (!line.isBlank()) {
-				tokens = line.split(",");
-				if (tokens.length >= RECORD_SIZE) {
-					try {
-						Record record = new Record(Long.parseLong(tokens[0]), tokens[1], tokens[2], Long.parseLong(tokens[3]));
-						records.add(record);
-					} catch (NumberFormatException e) {
-						log.log(Level.WARNING, e.toString());
+			while (scanner.hasNext()) {
+				line = scanner.nextLine();
+				
+				if (!line.isBlank()) {
+					tokens = line.split(",");
+					if (tokens.length >= RECORD_SIZE) {
+						try {
+							Record record = new Record(Long.parseLong(tokens[0]), tokens[1], tokens[2], Long.parseLong(tokens[3]));
+							records.add(record);
+						} catch (NumberFormatException e) {
+							log.log(Level.WARNING, e.toString());
+						}
 					}
 				}
 			}
+			
+			try {
+				result = recordDao.addRecords(records);
+			} catch (Exception e) {
+				log.log(Level.WARNING, e.toString());
+				result = HttpStatus.CONFLICT;
+			}
 		}
 		
-		HttpStatus result;
-		try {
-			result = recordDao.addRecords(records);
-		} catch (Exception e) {
-			log.log(Level.WARNING, e.toString());
-			return HttpStatus.CONFLICT;
-		}
-		
+		scanner.close();
 		return result;
-
 	}
 
 	@Override

@@ -61,6 +61,7 @@ public class RecordDao {
 		return em.find(Record.class, id);
 	}
 
+	@SuppressWarnings("unchecked")
 	public List<Record> getRecordsByTime(long timeFrom, long timeTo, int pageNumber, int pageSize) {
 		Query query = em.createQuery("select r from Record r where r.timeStamp between ?1 and ?2")
 		.setParameter(1, timeFrom)
